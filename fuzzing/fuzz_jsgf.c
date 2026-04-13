@@ -18,11 +18,15 @@
 #include <unistd.h>
 #include <pocketsphinx.h>
 
+#ifdef __AFL_FUZZ_TESTCASE_LEN
+/* AFL++ persistent mode */
 __AFL_FUZZ_INIT();
+#endif
 
 int main(int argc, char **argv)
 {
-    /* Initialize AFL++ persistent mode for better performance */
+#ifdef __AFL_FUZZ_TESTCASE_LEN
+    /* AFL++ mode - use persistent fuzzing */
 #ifdef __AFL_HAVE_MANUAL_CONTROL
     __AFL_INIT();
 #endif
@@ -50,6 +54,37 @@ int main(int argc, char **argv)
 
         unlink(tmpfile);
     }
+#else
+    /* Standalone mode - read from stdin for crash reproduction */
+    unsigned char buf[1024 * 1024];  /* 1MB max */
+    int len = read(STDIN_FILENO, buf, sizeof(buf));
+
+    if (len < 0) {
+        perror("read");
+        return 1;
+    }
+
+    /* Write fuzzer input to temporary file */
+    char tmpfile[] = "/tmp/fuzz_jsgf_XXXXXX";
+    int fd = mkstemp(tmpfile);
+    if (fd == -1) {
+        perror("mkstemp");
+        return 1;
+    }
+
+    write(fd, buf, len);
+    close(fd);
+
+    /* Try to parse the JSGF grammar */
+    jsgf_t *jsgf = jsgf_parse_file(tmpfile, NULL);
+
+    /* Cleanup */
+    if (jsgf) {
+        jsgf_grammar_free(jsgf);
+    }
+
+    unlink(tmpfile);
+#endif
 
     return 0;
 }

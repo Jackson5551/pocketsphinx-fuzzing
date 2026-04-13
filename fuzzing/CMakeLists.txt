@@ -44,3 +44,21 @@ target_include_directories(fuzz_fsg PRIVATE
     ${CMAKE_SOURCE_DIR}/include
     ${CMAKE_BINARY_DIR}/include
 )
+
+# Test crash reproducer
+add_executable(test_crash test_crash.c)
+target_link_libraries(test_crash pocketsphinx)
+target_include_directories(test_crash PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_BINARY_DIR}/include
+)
+
+# JSGF crash tester (no AFL)
+add_executable(test_jsgf_crash test_jsgf_crash.c)
+target_link_libraries(test_jsgf_crash pocketsphinx)
+target_include_directories(test_jsgf_crash PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_BINARY_DIR}/include
+)
