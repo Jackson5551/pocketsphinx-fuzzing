@@ -140,6 +140,12 @@ else()
   if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)
     add_subdirectory(test)
   endif()
+
+  # AFL++ Fuzzing harnesses
+  option(BUILD_FUZZING "Build AFL++ fuzzing harnesses" OFF)
+  if(BUILD_FUZZING)
+    add_subdirectory(fuzzing)
+  endif()
   configure_file(pocketsphinx.pc.in pocketsphinx.pc @ONLY)
   install(TARGETS pocketsphinx LIBRARY)
   install(DIRECTORY include/ TYPE INCLUDE)

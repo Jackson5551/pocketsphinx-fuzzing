@@ -1,0 +1,10 @@
+#JSGF V1.0 UTF-8;
+
+grammar navigation;
+
+public <command> = <action> <direction> [<distance>];
+
+<action> = (go | move | walk | run);
+<direction> = (forward | backward | left | right | up | down);
+<distance> = <number> (meters | feet | steps);
+<number> = (one | two | three | four | five | ten | twenty);
